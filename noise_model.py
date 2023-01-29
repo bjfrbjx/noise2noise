@@ -1,8 +1,10 @@
 import argparse
+import os
 import string
 import random
 import numpy as np
 import cv2
+from PIL import Image
 
 
 def get_noise_model(noise_type="gaussian,0,50"):
@@ -60,6 +62,21 @@ def get_noise_model(noise_type="gaussian,0,50"):
             img = img * (1 - mask) + noise * mask
             return img.astype(np.uint8)
         return add_impulse_noise
+    elif tokens[0] == "mark":
+        mark_dir=tokens[1]
+        mark_num = int(tokens[2])
+        mark_imgs=[Image.open(mark_dir+"/"+mark_file) for mark_file in os.listdir(mark_dir)]
+        def paste_mark(img):
+            bg = Image.fromarray(img[:,:,::-1])
+            for _ in range(mark_num):
+                layer = mark_imgs[random.randint(0, len(mark_imgs)-1)]
+                layer_arr=np.copy(np.uint8(layer))
+                layer_arr[:,:,-1]=layer_arr[:,:,-1]*random.uniform(0.4,1.0)
+                layer=Image.fromarray(layer_arr,mode="RGBA")
+                x, y = random.randint(0, bg.size[0] - layer.size[0]), random.randint(0, bg.size[1] - layer.size[1])
+                bg.paste(layer, (x, y), layer)
+            return np.uint8(bg.convert(mode="RGB"))[:,:,::-1]
+        return paste_mark
     else:
         raise ValueError("noise_type should be 'gaussian', 'clean', 'text', or 'impulse'")
 
