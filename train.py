@@ -3,6 +3,7 @@ import numpy as np
 from pathlib import Path
 from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from keras.optimizers import Adam
+
 from model import get_model, PSNR, L0Loss, UpdateAnnealingParameter
 from generator import NoisyImageGenerator, ValGenerator
 from noise_model import get_noise_model
@@ -72,10 +73,11 @@ def main():
     output_path = Path(__file__).resolve().parent.joinpath(args.output_path)
     model = get_model(args.model)
 
+
     if args.weight is not None:
         model.load_weights(args.weight)
 
-    opt = Adam(lr=lr)
+    opt = Adam(learning_rate=lr)
     callbacks = []
 
     if loss_type == "l0":
@@ -98,7 +100,7 @@ def main():
                                      mode="max",
                                      save_best_only=True))
 
-    hist = model.fit_generator(generator=generator,
+    hist = model.fit(generator,
                                steps_per_epoch=steps,
                                epochs=nb_epochs,
                                validation_data=val_generator,

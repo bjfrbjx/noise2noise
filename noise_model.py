@@ -13,7 +13,7 @@ def get_noise_model(noise_type="gaussian,0,50"):
         max_stddev = int(tokens[2])
 
         def gaussian_noise(img):
-            noise_img = img.astype(np.float)
+            noise_img = img.astype(np.float16)
             stddev = np.random.uniform(min_stddev, max_stddev)
             noise = np.random.randn(*img.shape) * stddev
             noise_img += noise
@@ -35,7 +35,7 @@ def get_noise_model(noise_type="gaussian,0,50"):
 
             while True:
                 n = random.randint(5, 10)
-                random_str = ''.join([random.choice(string.ascii_letters + string.digits) for i in range(n)])
+                random_str = ''.join([random.choice(string.ascii_letters + string.digits) for _ in range(n)])
                 font_scale = np.random.uniform(0.5, 1)
                 thickness = random.randint(1, 3)
                 (fw, fh), baseline = cv2.getTextSize(random_str, font, font_scale, thickness)
