@@ -5,6 +5,7 @@ import random
 import numpy as np
 import cv2
 from PIL import Image
+from PIL.Image import Resampling
 
 
 def get_noise_model(noise_type="gaussian,0,50"):
@@ -70,7 +71,11 @@ def get_noise_model(noise_type="gaussian,0,50"):
             bg = Image.fromarray(img[:,:,::-1])
             for _ in range(mark_num):
                 layer = mark_imgs[random.randint(0, len(mark_imgs)-1)]
+                #随机变形
+                layer_resize = (int(layer.size[0]*random.uniform(0.4, 1.5)),int(layer.size[1]*random.uniform(0.4, 1.5)))
+                layer=layer.resize(layer_resize,Resampling.LANCZOS)
                 layer_arr=np.copy(np.uint8(layer))
+                #水印透明度随机
                 layer_arr[:,:,-1]=layer_arr[:,:,-1]*random.uniform(0.4,1.0)
                 layer=Image.fromarray(layer_arr,mode="RGBA")
                 x, y = random.randint(0, bg.size[0] - layer.size[0]), random.randint(0, bg.size[1] - layer.size[1])
