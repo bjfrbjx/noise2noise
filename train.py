@@ -91,7 +91,7 @@ def main():
     val_noise_model = get_noise_model(args.val_noise_model)
     generator = NoisyImageGenerator(image_dir, source_noise_model, target_noise_model, batch_size=batch_size,
                                     image_size=image_size)
-    generator.len=steps * nb_epochs // batch_size
+    generator.len=steps * nb_epochs
 
     val_generator = ValGenerator(test_dir, val_noise_model)
     output_path.mkdir(parents=True, exist_ok=True)
