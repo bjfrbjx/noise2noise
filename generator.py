@@ -17,9 +17,10 @@ class NoisyImageGenerator(Sequence):
 
         if self.image_num == 0:
             raise ValueError("image dir '{}' does not include any image".format(image_dir))
+        self.len=self.image_num // self.batch_size
 
     def __len__(self):
-        return self.image_num // self.batch_size
+        return self.len
 
     def __getitem__(self, idx):
         batch_size = self.batch_size
@@ -68,4 +69,4 @@ class ValGenerator(Sequence):
         return self.image_num
 
     def __getitem__(self, idx):
-        return self.data[idx%self.image_num]
+        return self.data[idx]
