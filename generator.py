@@ -68,4 +68,4 @@ class ValGenerator(Sequence):
         return self.image_num
 
     def __getitem__(self, idx):
-        return self.data[idx]
+        return self.data[idx%self.image_num]
