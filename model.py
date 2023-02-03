@@ -40,8 +40,11 @@ def tf_log10(x):
 
 
 def PSNR(y_true, y_pred):
+    """
+    mse的级数表达,越大越好
+    """
     max_pixel = 255.0
-    y_pred = K.clip(y_pred, 0.0, 255.0)
+    y_pred = K.clip(y_pred, 0.0, max_pixel)
     return 10.0 * tf_log10((max_pixel ** 2) / (K.mean(K.square(y_pred - y_true))))
 
 

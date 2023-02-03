@@ -64,26 +64,31 @@ def get_noise_model(noise_type="gaussian,0,50"):
             return img.astype(np.uint8)
         return add_impulse_noise
     elif tokens[0] == "mark":
+        #水印图所在文件夹
         mark_dir=tokens[1]
-        mark_num = int(tokens[2])
         mark_imgs=[Image.open(mark_dir+"/"+mark_file) for mark_file in os.listdir(mark_dir)]
         def paste_mark(img):
+            #复制背景图
             bg = Image.fromarray(img[:,:,::-1])
-            for _ in range(mark_num):
-                layer = mark_imgs[random.randint(0, len(mark_imgs)-1)]
-                #随机变形
-                layer_resize = (int(layer.size[0]*random.uniform(0.4, 1.5)),int(layer.size[1]*random.uniform(0.4, 1.5)))
-                layer=layer.resize(layer_resize,Resampling.LANCZOS)
-                layer_arr=np.copy(np.uint8(layer))
-                #水印透明度随机
-                layer_arr[:,:,-1]=layer_arr[:,:,-1]*random.uniform(0.4,1.0)
-                layer=Image.fromarray(layer_arr,mode="RGBA")
-                x, y = random.randint(0, bg.size[0] - layer.size[0]), random.randint(0, bg.size[1] - layer.size[1])
-                bg.paste(layer, (x, y), layer)
+            # 随机选一张水印
+            layer = mark_imgs[random.randint(0, len(mark_imgs)-1)]
+            # 水印随机缩放
+            layer_resize = (int(layer.size[0]*random.uniform(0.4, 1.5)),int(layer.size[1]*random.uniform(0.4, 1.5)))
+            layer=layer.resize(layer_resize,Resampling.LANCZOS)
+            layer_arr=np.copy(np.uint8(layer))
+            # 水印随机透明度
+            layer_arr[:,:,-1]=layer_arr[:,:,-1]*random.uniform(0.4,1.0)
+            # 复制水印图的数组
+            layer=Image.fromarray(layer_arr,mode="RGBA")
+            # 在背景中的随机位置
+            x, y = random.randint(0, bg.size[0] - layer.size[0]), random.randint(0, bg.size[1] - layer.size[1])
+            # 水印叠加到底图
+            bg.paste(layer, (x, y), layer)
+            #RGB->BGR
             return np.uint8(bg.convert(mode="RGB"))[:,:,::-1]
         return paste_mark
     else:
-        raise ValueError("noise_type should be 'gaussian', 'clean', 'text', or 'impulse'")
+        raise ValueError("noise_type should be 'gaussian', 'clean', 'mark', 'text', or 'impulse'")
 
 
 def get_args():
