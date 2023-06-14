@@ -59,7 +59,7 @@ def main():
         if args.output_dir:
             cv2.imwrite(str(output_dir.joinpath(image_path.name))[:-4] + ".png", out_image)
         else:
-            cv2.imshow("result", out_image)
+            cv2.imshow("result", cv2.resize(out_image,dsize=(1800,600)))
             key = cv2.waitKey(-1)
             # "q": quit
             if key == 113:

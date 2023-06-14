@@ -1,11 +1,16 @@
 import argparse
 import os
+
+from freety_cn import put_chinese_text
+
+os.environ["WITH_FREETYPE"]="ON"
 import string
 import random
 import numpy as np
 import cv2
 from PIL import Image
 from PIL.Image import Resampling
+ft = put_chinese_text('simfang.ttf')
 
 
 def get_noise_model(noise_type="gaussian,0,50"):
@@ -25,6 +30,33 @@ def get_noise_model(noise_type="gaussian,0,50"):
         return gaussian_noise
     elif tokens[0] == "clean":
         return lambda img: img
+    elif tokens[0] == "text2":
+        zh_cn_list=[]
+        with open("3500常用汉字.txt","r",encoding="utf-8") as f:
+            for w in f.readlines():
+                zh_cn_list.append(w.strip())
+        def shuffled(list):
+            random.shuffle(list)
+            return list
+        def zh_CN(num=1):
+            return "".join(random.choice(zh_cn_list) for _ in range(num))
+
+        def add_text(img):
+            img = img.copy()
+            h, w, _ = img.shape
+
+            for _ in range(random.randint(3,5)):
+                random_str = ''.join([random.choice(string.printable[:62]) for _ in range(random.randint(3, 5))])
+                random_str += zh_CN(random.randint(3, 10))
+                random_str = "".join(shuffled(list(random_str)))
+                font_scale = np.random.randint(80,120)
+                x = random.randint(0, w-font_scale*len(random_str)-1)
+                y = random.randint(font_scale, h - 1 - font_scale)
+                color = (0xFF,0xFF,0xFF)
+                img = ft.draw_text(img, (x, y), random_str, font_scale, color)
+            return img
+
+        return add_text
     elif tokens[0] == "text":
         min_occupancy = int(tokens[1])
         max_occupancy = int(tokens[2])
@@ -48,7 +80,7 @@ def get_noise_model(noise_type="gaussian,0,50"):
                 cv2.putText(img, random_str, (x, y), font, font_scale, color, thickness)
                 cv2.putText(img_for_cnt, random_str, (x, y), font, font_scale, 255, thickness)
 
-                if (img_for_cnt > 0).sum() > h * w * occupancy / 100:
+                if (img_for_cnt > 0).sum() > h * w * occupancy / 1000:
                     break
             return img
         return add_text

@@ -38,7 +38,7 @@ elif tokens[0] == "mark":
 ## 训练方法
 
 - 1 提前准备自己的水印png(注意一定要是RGBA格式,png不一定是RGBA!可以百度RGBA的定义),放在dataset/mark文件夹下.
-- 2 在项目文件夹下执行如下命令.`python train.py --image_dir dataset/291 --test_dir dataset/Set14 --image_size 128 --lr 0.001 --source_noise_model mark,dataset/mark --target_noise_model clean --val_noise_model mark,dataset/mark --loss mae --output_path tmp/text_clean --weight dataset/weights.056-4.172-28.07752_text_clean.hdf5`.
+- 2 在项目文件夹下执行如下命令.`python train.py --image_dir dataset/train_imgs --test_dir dataset/test_imgs --image_size 128 --lr 0.001 --source_noise_model mark,dataset/mark --target_noise_model clean --val_noise_model mark,dataset/mark --loss mae --output_path tmp/mark_clean --weight dataset/weights.056-4.172-28.07752_text_clean.hdf5`.
  注意,--image_size 的值一定要大于所给定水印图的大小.比如给的水印图最大是64*128,--image_size 就要大于128.
  另外可以修改`--nb_epochs  --steps `来更改迭代次数.
  `--weight` 是初始化权重可以大大提升训练效率,`--output_path`指定的就是再训练权重导出的目录.
@@ -47,7 +47,7 @@ elif tokens[0] == "mark":
 ## 测试方法
 
 在项目文件夹下执行如下命令:
-`python test_model --weight_file tmp/text_clean/weights.041-2.947-33.96773.hdf5 --image_dir dataset/Set14 --test_noise_model mark,dataset/mark`
+`python test_model.py --weight_file tmp/mark_clean/weights.041-2.947-33.96773.hdf5 --image_dir dataset/Set14 --test_noise_model mark,dataset/mark`
 其中`--weight` 用的是上一步导出的再训练权重文件.执行命令后就会跳出来一个弹窗,按回车翻到下一页.左中右分别是原图,水印图,去水印图.得到效果如下:
 <img src="result/1.png" width="480px">
 <img src="result/2.png" width="480px">
