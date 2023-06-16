@@ -47,11 +47,11 @@ def get_noise_model(noise_type="gaussian,0,50"):
             img = img.copy()
             h, w, _ = img.shape
             line_h=h//6
-            for idx in range(random.randint(3, 5)):
+            for idx in range(1):#range(random.randint(3, 5)):
                 random_str = ''.join([random.choice(string.printable[:62]) for _ in range(random.randint(3, 5))])
                 random_str += zh_CN(random.randint(3, 10))
                 random_str = "".join(shuffled(list(random_str)))
-                font_scale = np.random.randint(80, 120)
+                font_scale = np.random.randint(8, 10)
                 x = random.randint(0, max(5,w-font_scale*len(random_str)-1))
                 y = random.randint(idx*line_h, min(h - font_scale-1,(idx+1)*line_h))
                 color = (0xFF, 0xFF, 0xFF)

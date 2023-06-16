@@ -62,3 +62,4 @@ elif tokens[0] == "mark":
 
 - [ ] 尝试unet结构
 
+python train.py --image_dir dataset/train_imgs --test_dir dataset/test_imgs --image_size 128 --lr 0.001 --source_noise_model text2,2 --target_noise_model clean --val_noise_model text2,2 --loss mae --output_path tmp/text2_clean --weight dataset/weights.056-4.172-28.07752_text_clean.hdf5
