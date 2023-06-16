@@ -2,15 +2,14 @@ import argparse
 import os
 
 from freety_cn import put_chinese_text
-
-os.environ["WITH_FREETYPE"]="ON"
 import string
 import random
 import numpy as np
 import cv2
 from PIL import Image
 from PIL.Image import Resampling
-ft = put_chinese_text('simfang.ttf')
+
+fts = [put_chinese_text(f'font/{k}') for k in os.listdir("font")]
 
 
 def get_noise_model(noise_type="gaussian,0,50"):
@@ -27,33 +26,36 @@ def get_noise_model(noise_type="gaussian,0,50"):
             noise_img += noise
             noise_img = np.clip(noise_img, 0, 255).astype(np.uint8)
             return noise_img
+
         return gaussian_noise
     elif tokens[0] == "clean":
         return lambda img: img
     elif tokens[0] == "text2":
-        zh_cn_list=[]
-        with open("3500常用汉字.txt","r",encoding="utf-8") as f:
+        zh_cn_list = []
+        with open("3500常用汉字.txt", "r", encoding="utf-8") as f:
             for w in f.readlines():
                 zh_cn_list.append(w.strip())
+
         def shuffled(list):
             random.shuffle(list)
             return list
+
         def zh_CN(num=1):
             return "".join(random.choice(zh_cn_list) for _ in range(num))
 
         def add_text(img):
             img = img.copy()
             h, w, _ = img.shape
-
-            for _ in range(random.randint(3,5)):
+            line_h=h//6
+            for idx in range(random.randint(3, 5)):
                 random_str = ''.join([random.choice(string.printable[:62]) for _ in range(random.randint(3, 5))])
                 random_str += zh_CN(random.randint(3, 10))
                 random_str = "".join(shuffled(list(random_str)))
-                font_scale = np.random.randint(80,120)
-                x = random.randint(0, w-font_scale*len(random_str)-1)
-                y = random.randint(font_scale, h - 1 - font_scale)
-                color = (0xFF,0xFF,0xFF)
-                img = ft.draw_text(img, (x, y), random_str, font_scale, color)
+                font_scale = np.random.randint(80, 120)
+                x = random.randint(0, max(5,w-font_scale*len(random_str)-1))
+                y = random.randint(idx*line_h, min(h - font_scale-1,(idx+1)*line_h))
+                color = (0xFF, 0xFF, 0xFF)
+                img = random.choice(fts).draw_text(img, (x, y), random_str, font_scale, color)
             return img
 
         return add_text
@@ -83,6 +85,7 @@ def get_noise_model(noise_type="gaussian,0,50"):
                 if (img_for_cnt > 0).sum() > h * w * occupancy / 1000:
                     break
             return img
+
         return add_text
     elif tokens[0] == "impulse":
         min_occupancy = int(tokens[1])
@@ -94,30 +97,34 @@ def get_noise_model(noise_type="gaussian,0,50"):
             noise = np.random.randint(256, size=img.shape)
             img = img * (1 - mask) + noise * mask
             return img.astype(np.uint8)
+
         return add_impulse_noise
     elif tokens[0] == "mark":
-        #水印图所在文件夹
-        mark_dir=tokens[1]
-        mark_imgs=[Image.open(mark_dir+"/"+mark_file) for mark_file in os.listdir(mark_dir)]
+        # 水印图所在文件夹
+        mark_dir = tokens[1]
+        mark_imgs = [Image.open(mark_dir + "/" + mark_file) for mark_file in os.listdir(mark_dir)]
+
         def paste_mark(img):
-            #复制背景图
-            bg = Image.fromarray(img[:,:,::-1])
+            # 复制背景图
+            bg = Image.fromarray(img[:, :, ::-1])
             # 随机选一张水印
-            layer = mark_imgs[random.randint(0, len(mark_imgs)-1)]
+            layer = mark_imgs[random.randint(0, len(mark_imgs) - 1)]
             # 水印随机缩放
-            layer_resize = (int(layer.size[0]*random.uniform(0.4, 1.5)),int(layer.size[1]*random.uniform(0.4, 1.5)))
-            layer=layer.resize(layer_resize,Resampling.LANCZOS)
-            layer_arr=np.copy(np.uint8(layer))
+            layer_resize = (
+                int(layer.size[0] * random.uniform(0.4, 1.5)), int(layer.size[1] * random.uniform(0.4, 1.5)))
+            layer = layer.resize(layer_resize, Resampling.LANCZOS)
+            layer_arr = np.copy(np.uint8(layer))
             # 水印随机透明度
-            layer_arr[:,:,-1]=layer_arr[:,:,-1]*random.uniform(0.4,1.0)
+            layer_arr[:, :, -1] = layer_arr[:, :, -1] * random.uniform(0.4, 1.0)
             # 复制水印图的数组
-            layer=Image.fromarray(layer_arr,mode="RGBA")
+            layer = Image.fromarray(layer_arr, mode="RGBA")
             # 在背景中的随机位置
             x, y = random.randint(0, bg.size[0] - layer.size[0]), random.randint(0, bg.size[1] - layer.size[1])
             # 水印叠加到底图
             bg.paste(layer, (x, y), layer)
-            #RGB->BGR
-            return np.uint8(bg.convert(mode="RGB"))[:,:,::-1]
+            # RGB->BGR
+            return np.uint8(bg.convert(mode="RGB"))[:, :, ::-1]
+
         return paste_mark
     else:
         raise ValueError("noise_type should be 'gaussian', 'clean', 'mark', 'text', or 'impulse'")

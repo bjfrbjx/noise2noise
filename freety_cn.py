@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 import numpy as np
 from freetype import unicode
@@ -100,16 +101,14 @@ if __name__ == '__main__':
     # just for test
     import cv2
 
-    line = '你好'
-    img = np.zeros([300, 300, 3])
+    line = '你好!A1'
+    img = np.zeros([800, 800, 3])
 
-    color_ = (0, 255, 0)  # Green
-    pos = (3, 3)
-    text_size = 24
-
-    # ft = put_chinese_text('wqy-zenhei.ttc')
-    ft = put_chinese_text('simfang.ttf')
-    image = ft.draw_text(img, pos, line, text_size, color_)
-
-    cv2.imshow('ss', image)
-    cv2.waitKey(0)
+    color_ = (255, 255, 255)  # Green
+    pos = (30, 30)
+    text_size = 124
+    for k in os.listdir("font"):
+        ft = put_chinese_text(f'font/{k}')
+        image = ft.draw_text(img, pos, line, text_size, color_)
+        cv2.imshow(k, image)
+        cv2.waitKey(0)
