@@ -92,9 +92,10 @@ class put_chinese_text(object):
         for row in range(rows):
             for col in range(cols):
                 if glyph_pixels[row * cols + col] != 0:
-                    img[y_pos + row][x_pos + col][0] = color[0]
-                    img[y_pos + row][x_pos + col][1] = color[1]
-                    img[y_pos + row][x_pos + col][2] = color[2]
+                    if y_pos + row<len(img) and x_pos + col<len(img[0]):
+                        img[y_pos + row][x_pos + col][0] = color[0]
+                        img[y_pos + row][x_pos + col][1] = color[1]
+                        img[y_pos + row][x_pos + col][2] = color[2]
 
 
 if __name__ == '__main__':

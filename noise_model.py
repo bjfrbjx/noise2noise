@@ -9,8 +9,8 @@ import cv2
 from PIL import Image
 from PIL.Image import Resampling
 
-fts = [put_chinese_text(f'font/{k}') for k in os.listdir("font")]
-
+#fts = [put_chinese_text(f'font/{k}') for k in os.listdir("font")]
+fts=[put_chinese_text(f'font/ablibabaPUHUI-M.ttf')]
 
 def get_noise_model(noise_type="gaussian,0,50"):
     tokens = noise_type.split(sep=",")
@@ -46,14 +46,15 @@ def get_noise_model(noise_type="gaussian,0,50"):
         def add_text(img):
             img = img.copy()
             h, w, _ = img.shape
-            line_h=h//6
-            for idx in range(1):#range(random.randint(3, 5)):
+            k=random.randint(10, 15)
+            line_h=h//(k+1)
+            for idx in range(0,k,3):
                 random_str = ''.join([random.choice(string.printable[:62]) for _ in range(random.randint(3, 5))])
                 random_str += zh_CN(random.randint(3, 10))
                 random_str = "".join(shuffled(list(random_str)))
-                font_scale = np.random.randint(8, 10)
+                font_scale = random.randint(50,80)
                 x = random.randint(0, max(5,w-font_scale*len(random_str)-1))
-                y = random.randint(idx*line_h, min(h - font_scale-1,(idx+1)*line_h))
+                y = random.randint(idx*line_h,(idx+1)*line_h)
                 color = (0xFF, 0xFF, 0xFF)
                 img = random.choice(fts).draw_text(img, (x, y), random_str, font_scale, color)
             return img
