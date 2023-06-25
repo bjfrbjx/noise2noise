@@ -120,7 +120,7 @@ def get_noise_model(noise_type="gaussian,0,50"):
             layer = layer.resize(layer_resize, Resampling.LANCZOS)
             layer_arr = np.copy(np.uint8(layer))
             # 水印随机透明度
-            layer_arr[:, :, -1] = layer_arr[:, :, -1] * random.uniform(0.4, 1.0)
+            layer_arr[:, :, -1] = layer_arr[:, :, -1] * random.uniform(0.8, 1.0)
             # 复制水印图的数组
             layer = Image.fromarray(layer_arr, mode="RGBA")
             # 在背景中的随机位置
