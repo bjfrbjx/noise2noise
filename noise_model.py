@@ -108,8 +108,12 @@ def get_noise_model(noise_type="gaussian,0,50"):
         def paste_mark(img):
             # 复制背景图
             bg = Image.fromarray(img[:, :, ::-1])
-            # 随机选一张水印
+            # 随机选一张水印(修订在范围内)
             layer = mark_imgs[random.randint(0, len(mark_imgs) - 1)]
+            ori_size=max(layer.shape[:2])*1.1
+            target_size = min(bg.shape[:2]) * 0.9
+            if ori_size>target_size:
+                layer=layer.resize((int(bg.shape[1]*target_size/ori_size),int(bg.shape[0]*target_size/ori_size)))
             # 水印随机缩放
             layer_resize = (
                 int(layer.size[0] * random.uniform(0.4, 1.5)), int(layer.size[1] * random.uniform(0.4, 1.5)))
