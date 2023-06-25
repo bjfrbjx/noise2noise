@@ -47,7 +47,7 @@ elif tokens[0] == "mark":
 ## 测试方法
 
 在项目文件夹下执行如下命令:
-`python test_model.py --weight_file tmp/mark_clean/weights.041-2.947-33.96773.hdf5 --image_dir dataset/Set14 --test_noise_model mark,dataset/mark`
+`python test_model.py --weight_file tmp/mark_clean/weights.041-2.947-33.96773.hdf5 --image_dir dataset/test_dir --test_noise_model mark,dataset/mark`
 其中`--weight` 用的是上一步导出的再训练权重文件.执行命令后就会跳出来一个弹窗,按回车翻到下一页.左中右分别是原图,水印图,去水印图.得到效果如下:
 <img src="result/1.png" width="480px">
 <img src="result/2.png" width="480px">
